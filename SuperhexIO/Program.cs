@@ -1,5 +1,7 @@
 ﻿using SuperhexIO.Commands;
+using SuperhexIO.Models;
 using SuperhexIO.Protocols;
+using SuperhexIO.Query;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -30,11 +32,31 @@ namespace SuperhexIO
 
             // game processor
 
+            GameState gameState = new GameState();
+            Dictionary<byte, BaseQuery> commands = new Dictionary<byte, BaseQuery>
+            {
+                { 1, new GameStartQuery(1) },
+                { 15, new ReciveSkin(15,gameState.PlayerSkin) },
+                { 13, new TranslationQuery(13,gameState) }
+            };
+
+
             byte[] memory = new byte[43]; // TODO how many
             while (clientWebSocket.State == WebSocketState.Open)
             {
                 WebSocketReceiveResult text = await clientWebSocket.ReceiveAsync(memory, CancellationToken.None);
-                Console.WriteLine(memory[0]);
+
+                byte key = memory[0];
+                if (commands.ContainsKey(key))
+                {
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    commands[key].Handle(memory);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"Command {key} is not implemented");
+                }
             }
 
             Console.ReadLine();

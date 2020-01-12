@@ -2,11 +2,11 @@
 
 namespace SuperhexIO.Protocols
 {
-    public abstract class BaseCommand<T>
+    public abstract class BaseCommand
     {
         protected readonly ClientWebSocket client;
         public BaseCommand(ClientWebSocket clientWebSocket) { client = clientWebSocket; }
 
-        public abstract void Invoke(T data);
+        public abstract void Invoke();
     }
 }

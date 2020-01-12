@@ -5,13 +5,15 @@ using System.Threading;
 
 namespace SuperhexIO.Protocols
 {
-    public class Registration : BaseCommand<string>
+    public class Registration : BaseCommand
     {
-        public Registration(ClientWebSocket clientWebSocket) : base(clientWebSocket)
+        private readonly string nickName;
+        public Registration(ClientWebSocket clientWebSocket, string nickName = "sad") : base(clientWebSocket)
         {
+            this.nickName = nickName;
         }
 
-        public override async void Invoke(string nickName = "sad")
+        public override async void Invoke()
         {
             // new ArrayBuffer(2 + 2 * it.length + 1 + (ot ? 2 * ot.length : 0) + 2);
             byte[] buffer = new byte[2 + 2 * nickName.Length + 1 + 2];
