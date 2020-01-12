@@ -36,10 +36,22 @@ namespace SuperhexIO
             GameState gameState = new GameState();
             Dictionary<byte, BaseQuery> commands = new Dictionary<byte, BaseQuery>
             {
-                { 1, new GameStartQuery(1) },
-                { 15, new ReciveSkin(15,gameState.PlayerSkin) },
-                { 13, new TranslationQuery(13,gameState) },
-                { 11, new ReceiveUsername(11,gameState) }
+                { 1, new GameStartQuery(1) }, // TODO hz
+                // 2
+                // 3
+                {4, new CaptureHex(4) }, // TODO capture
+                // 5 
+                { 13, new TranslationQuery(13, gameState)},
+                // 6
+                // 14
+                { 7, new DeathQuery(7) }, // TODO decapture
+                // 8  
+                // 9
+                // 10
+                { 11, new ReceiveUsername(11,gameState)},
+                { 15, new ReciveSkin(15,gameState.PlayerSkin)},
+                // 12
+                // 99
             };
 
 
