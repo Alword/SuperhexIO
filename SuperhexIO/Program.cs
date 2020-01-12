@@ -4,6 +4,7 @@ using SuperhexIO.Protocols;
 using SuperhexIO.Query;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
@@ -37,20 +38,25 @@ namespace SuperhexIO
             {
                 { 1, new GameStartQuery(1) },
                 { 15, new ReciveSkin(15,gameState.PlayerSkin) },
-                { 13, new TranslationQuery(13,gameState) }
+                { 13, new TranslationQuery(13,gameState) },
+                { 11, new ReceiveUsername(11,gameState) }
             };
 
 
-            byte[] memory = new byte[43]; // TODO how many
+            byte[] buffer = new byte[43]; // TODO how many
             while (clientWebSocket.State == WebSocketState.Open)
             {
-                WebSocketReceiveResult text = await clientWebSocket.ReceiveAsync(memory, CancellationToken.None);
+                WebSocketReceiveResult text = await clientWebSocket.ReceiveAsync(buffer, CancellationToken.None);
 
-                byte key = memory[0];
+                byte key = buffer[0];
                 if (commands.ContainsKey(key))
                 {
+                    if (!text.EndOfMessage)
+                    {
+                        buffer = await HandleLongMessage(buffer, clientWebSocket);
+                    }
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    commands[key].Handle(memory);
+                    commands[key].Handle(buffer);
                 }
                 else
                 {
@@ -60,6 +66,20 @@ namespace SuperhexIO
             }
 
             Console.ReadLine();
+        }
+
+        static async Task<byte[]> HandleLongMessage(byte[] currentBuffer, ClientWebSocket clientWebSocket)
+        {
+            bool isEndOfMessage = false;
+            List<byte> data = currentBuffer.ToList();
+            byte[] extraMemory = new byte[256];
+            while (!isEndOfMessage)
+            {
+                var messageInfo = await clientWebSocket.ReceiveAsync(extraMemory, CancellationToken.None);
+                isEndOfMessage = messageInfo.EndOfMessage;
+                data.AddRange(extraMemory.ToList());
+            }
+            return data.ToArray();
         }
     }
 }
