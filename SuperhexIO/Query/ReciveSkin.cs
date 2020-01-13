@@ -1,4 +1,5 @@
 ﻿using SuperhexIO.Extensions;
+using SuperhexIO.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,25 +8,17 @@ namespace SuperhexIO.Query
 {
     public class ReciveSkin : BaseQuery
     {
-        public readonly Dictionary<int, int> playersSkin;
-        public ReciveSkin(int code, Dictionary<int, int> playersSkin) : base(code)
+        public readonly GameState gameState;
+        public ReciveSkin(int code, GameState gameState) : base(code)
         {
-            this.playersSkin = playersSkin;
+            this.gameState = gameState;
         }
 
         public override void Handle(byte[] buffer)
         {
             int skinId = buffer.ToInt16(1);
             int playerId = buffer.ToInt16(3);
-            if (playersSkin.ContainsKey(playerId))
-            {
-                playersSkin[playerId] = skinId;
-            }
-            else
-            {
-                playersSkin.Add(playerId, skinId);
-            }
-            Console.WriteLine($"skin {skinId} recived for player {playerId}");
+            gameState.RegisterSkin(playerId, skinId);
         }
     }
 }

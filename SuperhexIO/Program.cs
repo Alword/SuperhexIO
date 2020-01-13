@@ -28,32 +28,32 @@ namespace SuperhexIO
 
             // game register
 
-            Registration registration = new Registration(clientWebSocket);
-            registration.Invoke();
-
             // game processor
 
             GameState gameState = new GameState();
             Dictionary<byte, BaseQuery> commands = new Dictionary<byte, BaseQuery>
             {
-                { 1, new GameStartQuery(1) }, // TODO hz
+                { 1, new GameStartQuery(1,new Handshake(clientWebSocket)) }, // TODO hz
                 // 2
-                // 3
+                {3, new SelfMovement(3) },
                 {4, new CaptureHex(4) }, // TODO capture
                 // 5 
                 { 13, new TranslationQuery(13, gameState)},
                 // 6
                 // 14
                 { 7, new DeathQuery(7) }, // TODO decapture
-                // 8  
+                // {8, }  
                 // 9
-                // 10
+                // {10, }
                 { 11, new ReceiveUsername(11,gameState)},
-                { 15, new ReciveSkin(15,gameState.PlayerSkin)},
+                { 15, new ReciveSkin(15,gameState)},
                 // 12
                 // 99
             };
 
+
+            Queue<byte[]> messageQueue = new Queue<byte[]>();
+            HandleClientInput(clientWebSocket, messageQueue);
 
             byte[] buffer = new byte[43]; // TODO how many
             while (clientWebSocket.State == WebSocketState.Open)
@@ -67,13 +67,13 @@ namespace SuperhexIO
                     {
                         buffer = await HandleLongMessage(buffer, clientWebSocket);
                     }
-                    Console.ForegroundColor = ConsoleColor.Gray;
                     commands[key].Handle(buffer);
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine($"Command {key} is not implemented");
+                    Console.ForegroundColor = ConsoleColor.Gray;
                 }
             }
 
@@ -92,6 +92,24 @@ namespace SuperhexIO
                 data.AddRange(extraMemory.ToList());
             }
             return data.ToArray();
+        }
+
+        static async void HandleClientInput(ClientWebSocket clientWebSocket, Queue<byte[]> bufferQueue)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                Random random = new Random();
+                Registration registration = new Registration(clientWebSocket);
+                registration.Invoke();
+                Movement movement = new Movement(clientWebSocket);
+                Rejoin rejoin = new Rejoin(clientWebSocket);
+                while (true)
+                {
+                    Console.ReadLine();
+                    float angle = (float)random.NextDouble() * (3f + 3f) - 3f;
+                    movement.Invoke(angle);
+                }
+            });
         }
     }
 }

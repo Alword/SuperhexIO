@@ -22,7 +22,7 @@ namespace SuperhexIO.Query
                 points[i].X = buffer.ToInt16(5 + 4 * i);
                 points[i].Y = buffer.ToInt16(5 + 4 * i + 2);
             }
-            Console.WriteLine($"[Captured] by PlayerId: {playerId}, path: {pathCount}, hexs: TODO"); // Y(A) lencth
+            // Console.WriteLine($"[Captured] by PlayerId: {playerId}, path: {pathCount}, hexs: TODO"); // Y(A) lencth
         }
     }
 }

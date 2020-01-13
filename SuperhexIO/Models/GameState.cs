@@ -8,7 +8,7 @@ namespace SuperhexIO.Models
     {
         private Queue<PlayerTranslation> Translations { get; set; }
         private Dictionary<int, string> PlayerNick { get; set; }
-        public Dictionary<int, int> PlayerSkin { get; private set; }
+        private Dictionary<int, int> PlayerSkin { get; set; }
 
         public GameState()
         {
@@ -17,25 +17,36 @@ namespace SuperhexIO.Models
             this.Translations = new Queue<PlayerTranslation>(256);
         }
 
+        public void RegisterSkin(int playerId, int skinId)
+        {
+            RegisterDictionary(playerId, skinId, PlayerSkin);
+            //Console.WriteLine($"skin {skinId} recived for player {playerId}");
+        }
+
         public void RegisterTranslation(PlayerTranslation playerTranslation)
         {
             Translations.Enqueue(playerTranslation);
             if (Translations.Count > 100)
                 Translations.Clear();
-            //Console.WriteLine(playerTranslation);
+            // Console.WriteLine(playerTranslation);
         }
 
         public void RegisterNick(int playerId, string nickName)
         {
-            if (PlayerNick.ContainsKey(playerId))
+            RegisterDictionary(playerId, nickName, PlayerNick);
+            // Console.WriteLine($"[Username] {nickName} received for player {playerId}");
+        }
+
+        private static void RegisterDictionary<Key, Value>(Key key, Value value, Dictionary<Key, Value> dictionary)
+        {
+            if (dictionary.ContainsKey(key))
             {
-                PlayerNick[playerId] = nickName;
+                dictionary[key] = value;
             }
             else
             {
-                PlayerNick.Add(playerId, nickName);
+                dictionary.Add(key, value);
             }
-            Console.WriteLine($"username {nickName} received for player {playerId}");
         }
     }
 }

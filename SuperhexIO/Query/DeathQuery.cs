@@ -15,7 +15,7 @@ namespace SuperhexIO.Query
         {
             short playerId = buffer.ToInt16(1); // i
             short killerId = buffer.ToInt16(3); // a
-            Console.WriteLine($"player {playerId} is dead, killer is {killerId}");
+            // Console.WriteLine($"player {playerId} is dead, killer is {killerId}");
 
             // TODO Draw impact
 
